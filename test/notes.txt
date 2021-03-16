@@ -1,0 +1,13 @@
+These tests are divided into two categories. Each category requires a
+different driver. Both drivers are written in Python for the sake of
+convince. Both categories test for both correct functionality as well as
+proper handling of errors.
+
+Unit testing requires the actual source code to test. Broadly, the tests
+are organized by file name. Each test is a stand-alone executable that
+outputs information on stdout. That information is captured and compared
+to known good output.
+
+Functional tests are ones that actually use the generated executable to
+compile and run actual clock code. These tests are organized by catagories
+that come from testing areas of the actual syntax of a complete program.

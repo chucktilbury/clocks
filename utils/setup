@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+if [ $(basename $PWD) != "clocks" ]; then
+    echo "This script must be run in the root build directory"
+    exit
+fi
+
+if [ -z $CLOCKS_ROOT_DIR ]; then
+    if [ ! -d build ]; then
+        mkdir build
+    fi
+    export CLOCKS_ROOT_DIR=$PWD
+    export PATH=$CLOCKS_ROOT_DIR/bin:$CLOCKS_ROOT_DIR/utils:$PATH
+    bash --init-file <( echo "source $HOME/.bashrc; cd $CLOCKS_ROOT_DIR/build; cmake ..; PS1='(clocks) \u@\h:\w \$ '")
+else
+    cd $CLOCKS_ROOT_DIR
+    if [ ! -d build ]; then
+        mkdir build
+    fi
+    cd build
+    cmake ..
+fi
+
