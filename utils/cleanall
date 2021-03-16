@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 if [ ! -z $CLOCKS_ROOT_DIR ]; then
+
+    cd $CLOCKS_ROOT_DIR/build
+    make clean
+
     cd $CLOCKS_ROOT_DIR
-    if [ -d bin ]; then
-        rm -rf bin
+    if [ -d $CLOCKS_ROOT_DIR/bin ]; then
+        rm -rf $CLOCKS_ROOT_DIR/bin
     fi
 
-    if [ -d build ]; then
-        rm -rf build
+    if [ -d $CLOCKS_ROOT_DIR/test/bin ]; then
+        rm -rf $CLOCKS_ROOT_DIR/test/bin
+    fi
+
+    if [ -d $CLOCKS_ROOT_DIR/build ]; then
+        rm -rf $CLOCKS_ROOT_DIR/build
     fi
 else
     echo "error: clocks environment not set"
