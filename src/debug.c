@@ -62,18 +62,6 @@ int disassembleInstruction(Chunk* chunk, int offset) {
         case OP_DIV:    return simpleInstruction("OP_DIV", offset);
         case OP_MOD:    return simpleInstruction("OP_MOD", offset);
 
-        // case OP_UADD:   return simpleInstruction("OP_UADD", offset);
-        // case OP_USUB:   return simpleInstruction("OP_USUB", offset);
-        // case OP_UMUL:   return simpleInstruction("OP_UMUL", offset);
-        // case OP_UDIV:   return simpleInstruction("OP_UDIV", offset);
-        // case OP_UMOD:   return simpleInstruction("OP_UMOD", offset);
-
-        // case OP_IADD:   return simpleInstruction("OP_IADD", offset);
-        // case OP_ISUB:   return simpleInstruction("OP_ISUB", offset);
-        // case OP_IMUL:   return simpleInstruction("OP_IMUL", offset);
-        // case OP_IDIV:   return simpleInstruction("OP_IDIV", offset);
-        // case OP_IMOD:   return simpleInstruction("OP_FMOD", offset);
-
         case OP_NEGATE:     return simpleInstruction("OP_NEGATE", offset);
         case OP_CONSTANT:   return constantInstruction("OP_CONSTANT", chunk, offset);
         case OP_RETURN:     return simpleInstruction("OP_RETURN", offset);

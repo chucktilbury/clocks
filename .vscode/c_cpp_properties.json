@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/test/unit_test",
                 "${workspaceFolder}/src",
-                "${workspaceFolder}/test/unit_test/mocks"
+                "${workspaceFolder}/test/unit_test/mocks",
+                "/usr/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

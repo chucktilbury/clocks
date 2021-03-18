@@ -93,9 +93,14 @@ static bool isFalsey(Value value) {
 
     When two different numerical types are operated upon arithmetically, the
     "return" value has to be determined has to be determined before the result
-    is returned to the stack. The "largest" choice is made. That is the one
-    that required the most resolution. They are selected in this order: FNUM,
-    INUM, UNUM.
+    is returned to the stack.
+
+    They are selected in this order:
+    1. STRING
+    2. BOOL
+    3. FNUM
+    4. INUM
+    5. UNUM
 
     When this returns, the two values passed to the function have been
     converted to the same type.
@@ -109,6 +114,8 @@ static inline ValueType binaryPromotion(Value* a, Value* b) { // __attribute__((
     ValueType type = VAL_UNUM;
 
     switch(a->type) {
+        case VAL_OBJ:
+            break;
         case VAL_BOOL:
             switch(b->type) {
                 case VAL_FNUM:
@@ -289,41 +296,41 @@ static inline int binaryArithOperation(OpCode op) { // __attribute__((always_inl
     switch(op) {
         case OP_ADD:
             switch(val_type) {
-                case VAL_FNUM: result.as.fnum = AS_FNUM(a) + AS_FNUM(b); break;
-                case VAL_INUM: result.as.inum = AS_INUM(a) + AS_INUM(b); break;
-                case VAL_UNUM: result.as.unum = AS_UNUM(a) + AS_UNUM(b); break;
+                case VAL_FNUM: AS_FNUM(result) = AS_FNUM(a) + AS_FNUM(b); break;
+                case VAL_INUM: AS_INUM(result) = AS_INUM(a) + AS_INUM(b); break;
+                case VAL_UNUM: AS_UNUM(result) = AS_UNUM(a) + AS_UNUM(b); break;
                 default: ;// unreachable
             }
             break;
         case OP_SUB:
             switch(val_type) {
-                case VAL_FNUM: result.as.fnum = AS_FNUM(a) - AS_FNUM(b); break;
-                case VAL_INUM: result.as.inum = AS_INUM(a) - AS_INUM(b); break;
-                case VAL_UNUM: result.as.unum = AS_UNUM(a) - AS_UNUM(b); break;
+                case VAL_FNUM: AS_FNUM(result) = AS_FNUM(a) - AS_FNUM(b); break;
+                case VAL_INUM: AS_INUM(result) = AS_INUM(a) - AS_INUM(b); break;
+                case VAL_UNUM: AS_UNUM(result) = AS_UNUM(a) - AS_UNUM(b); break;
                 default: ;// unreachable
             }
             break;
         case OP_MUL:
             switch(val_type) {
-                case VAL_FNUM: result.as.fnum = AS_FNUM(a) * AS_FNUM(b); break;
-                case VAL_INUM: result.as.inum = AS_INUM(a) * AS_INUM(b); break;
-                case VAL_UNUM: result.as.unum = AS_UNUM(a) * AS_UNUM(b); break;
+                case VAL_FNUM: AS_FNUM(result) = AS_FNUM(a) * AS_FNUM(b); break;
+                case VAL_INUM: AS_INUM(result) = AS_INUM(a) * AS_INUM(b); break;
+                case VAL_UNUM: AS_UNUM(result) = AS_UNUM(a) * AS_UNUM(b); break;
                 default: ;// unreachable
             }
             break;
         case OP_DIV:
             switch(val_type) {
-                case VAL_FNUM: result.as.fnum = AS_FNUM(a) / AS_FNUM(b); break;
-                case VAL_INUM: result.as.inum = AS_INUM(a) / AS_INUM(b); break;
-                case VAL_UNUM: result.as.unum = AS_UNUM(a) / AS_UNUM(b); break;
+                case VAL_FNUM: AS_FNUM(result) = AS_FNUM(a) / AS_FNUM(b); break;
+                case VAL_INUM: AS_INUM(result) = AS_INUM(a) / AS_INUM(b); break;
+                case VAL_UNUM: AS_UNUM(result) = AS_UNUM(a) / AS_UNUM(b); break;
                 default:; // unreachable
             }
             break;
         case OP_MOD:
             switch(val_type) {
-                case VAL_FNUM: result.as.fnum = fmod(AS_FNUM(a), AS_FNUM(b)); break;
-                case VAL_INUM: result.as.inum = AS_INUM(a) % AS_INUM(b); break;
-                case VAL_UNUM: result.as.unum = AS_UNUM(a) % AS_UNUM(b); break;
+                case VAL_FNUM: AS_FNUM(result) = fmod(AS_FNUM(a), AS_FNUM(b)); break;
+                case VAL_INUM: AS_INUM(result) = AS_INUM(a) % AS_INUM(b); break;
+                case VAL_UNUM: AS_UNUM(result) = AS_UNUM(a) % AS_UNUM(b); break;
                 default: ;// unreachable
             }
             break;
@@ -361,55 +368,55 @@ static inline int binaryCompOperation(OpCode op) { // __attribute__((always_inli
     switch(op) {
         case OP_GREATER:
             switch(val_type) {
-                case VAL_FNUM: result = (a.as.fnum > b.as.fnum); break;
-                case VAL_INUM: result = (a.as.inum > b.as.inum); break;
-                case VAL_UNUM: result = (a.as.unum > b.as.unum); break;
-                case VAL_BOOL: result = (a.as.boolean > b.as.boolean); break;
+                case VAL_FNUM: result = (AS_FNUM(a) > AS_FNUM(b)); break;
+                case VAL_INUM: result = (AS_INUM(a) > AS_INUM(b)); break;
+                case VAL_UNUM: result = (AS_UNUM(a) > AS_UNUM(b)); break;
+                case VAL_BOOL: result = (AS_BOOL(a) > AS_BOOL(b)); break;
                 default: ;// unreachable
             }
             break;
         case OP_LESS:
             switch(val_type) {
-                case VAL_FNUM: result = (a.as.fnum < b.as.fnum); break;
-                case VAL_INUM: result = (a.as.inum < b.as.inum); break;
-                case VAL_UNUM: result = (a.as.unum < b.as.unum); break;
-                case VAL_BOOL: result = (a.as.boolean < b.as.boolean); break;
+                case VAL_FNUM: result = (AS_FNUM(a) < AS_FNUM(b)); break;
+                case VAL_INUM: result = (AS_INUM(a) < AS_INUM(b)); break;
+                case VAL_UNUM: result = (AS_UNUM(a) < AS_UNUM(b)); break;
+                case VAL_BOOL: result = (AS_BOOL(a) < AS_BOOL(b)); break;
                 default: ;// unreachable
             }
             break;
         case OP_GREATER_EQUAL:
             switch(val_type) {
-                case VAL_FNUM: result = (a.as.fnum >= b.as.fnum); break;
-                case VAL_INUM: result = (a.as.inum >= b.as.inum); break;
-                case VAL_UNUM: result = (a.as.unum >= b.as.unum); break;
-                case VAL_BOOL: result = (a.as.boolean >= b.as.boolean); break;
+                case VAL_FNUM: result = (AS_FNUM(a) >= AS_FNUM(b)); break;
+                case VAL_INUM: result = (AS_INUM(a) >= AS_INUM(b)); break;
+                case VAL_UNUM: result = (AS_UNUM(a) >= AS_UNUM(b)); break;
+                case VAL_BOOL: result = (AS_BOOL(a) >= AS_BOOL(b)); break;
                 default: ;// unreachable
             }
             break;
         case OP_LESS_EQUAL:
             switch(val_type) {
-                case VAL_FNUM: result = (a.as.fnum <= b.as.fnum); break;
-                case VAL_INUM: result = (a.as.inum <= b.as.inum); break;
-                case VAL_UNUM: result = (a.as.unum <= b.as.unum); break;
-                case VAL_BOOL: result = (a.as.boolean <= b.as.boolean); break;
+                case VAL_FNUM: result = (AS_FNUM(a) <= AS_FNUM(b)); break;
+                case VAL_INUM: result = (AS_INUM(a) <= AS_INUM(b)); break;
+                case VAL_UNUM: result = (AS_UNUM(a) <= AS_UNUM(b)); break;
+                case VAL_BOOL: result = (AS_BOOL(a) <= AS_BOOL(b)); break;
                 default: ;// unreachable
             }
             break;
         case OP_EQUAL:
             switch(val_type) {
-                case VAL_FNUM: result = (a.as.fnum == b.as.fnum); break;
-                case VAL_INUM: result = (a.as.inum == b.as.inum); break;
-                case VAL_UNUM: result = (a.as.unum == b.as.unum); break;
-                case VAL_BOOL: result = (a.as.boolean == b.as.boolean); break;
+                case VAL_FNUM: result = (AS_FNUM(a) == AS_FNUM(b)); break;
+                case VAL_INUM: result = (AS_INUM(a) == AS_INUM(b)); break;
+                case VAL_UNUM: result = (AS_UNUM(a) == AS_UNUM(b)); break;
+                case VAL_BOOL: result = (AS_BOOL(a) == AS_BOOL(b)); break;
                 default: ;// unreachable
             }
             break;
         case OP_NOT_EQUAL:
             switch(val_type) {
-                case VAL_FNUM: result = (a.as.fnum != b.as.fnum); break;
-                case VAL_INUM: result = (a.as.inum != b.as.inum); break;
-                case VAL_UNUM: result = (a.as.unum != b.as.unum); break;
-                case VAL_BOOL: result = (a.as.boolean != b.as.boolean); break;
+                case VAL_FNUM: result = (AS_FNUM(a) != AS_FNUM(b)); break;
+                case VAL_INUM: result = (AS_INUM(a) != AS_INUM(b)); break;
+                case VAL_UNUM: result = (AS_UNUM(a) != AS_UNUM(b)); break;
+                case VAL_BOOL: result = (AS_BOOL(a) != AS_BOOL(b)); break;
                 default: ;// unreachable
             }
             break;
@@ -442,9 +449,9 @@ static inline int unaryArithOperation(OpCode op) { // __attribute__((always_inli
     switch(op) {
         case OP_NEGATE:
             switch(a.type) {
-                case VAL_FNUM: a.as.fnum = -a.as.fnum; break;
-                case VAL_INUM: a.as.inum = -a.as.inum; break;
-                case VAL_UNUM: a.as.unum = -a.as.unum; break;
+                case VAL_FNUM: AS_FNUM(a) = -AS_FNUM(a); break;
+                case VAL_INUM: AS_INUM(a) = -AS_INUM(a); break;
+                case VAL_UNUM: AS_UNUM(a) = -AS_UNUM(a); break;
                 default: ;// unreachable
             }
             break;
@@ -465,18 +472,7 @@ static InterpretResult run() {
 
 #define READ_WORD() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_WORD()])
-#if 0
-#define BINARY_OP(valueType, op) \
-    do { \
-        if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) { \
-            runtimeError("Operands must be numbers."); \
-            return INTERPRET_RUNTIME_ERROR; \
-        } \
-        double b = AS_NUMBER(pop()); \
-        double a = AS_NUMBER(pop()); \
-        push(valueType(a op b)); \
-    } while (false)
-#endif
+
     int error = 0;
 
     while(!error) {
@@ -493,17 +489,6 @@ static InterpretResult run() {
 
         uint16_t instruction;
         switch (instruction = READ_WORD()) {
-            // case OP_ADD:    BINARY_OP(NUMBER_VAL, +); break;
-            // case OP_SUB:    BINARY_OP(NUMBER_VAL, -); break;
-            // case OP_MUL:    BINARY_OP(NUMBER_VAL, *); break;
-            // case OP_DIV:    BINARY_OP(NUMBER_VAL, / ); break;
-            // case OP_MOD: {
-            //     Value b = pop();
-            //     Value a = pop();
-            //     push(NUMBER_VAL(fmod(AS_NUMBER(a), AS_NUMBER(b))));
-            //     break;
-            // }
-
             case OP_ADD:
             case OP_SUB:
             case OP_MUL:
@@ -511,11 +496,6 @@ static InterpretResult run() {
             case OP_MOD:
                 error = binaryArithOperation(instruction);
                 break;
-
-            // case OP_GREATER:  BINARY_OP(BOOL_VAL, > ); break;
-            // case OP_LESS:     BINARY_OP(BOOL_VAL, < ); break;
-            // case OP_GREATER_EQUAL:  BINARY_OP(BOOL_VAL, >= ); break;
-            // case OP_LESS_EQUAL:     BINARY_OP(BOOL_VAL, <= ); break;
 
             case OP_GREATER:
             case OP_LESS:
@@ -528,12 +508,6 @@ static InterpretResult run() {
 
             case OP_NEGATE:
                 error = unaryArithOperation(instruction);
-                // if(!IS_NUMBER(peek(0))) {
-                //     runtimeError("Operand must be a number.");
-                //     return INTERPRET_RUNTIME_ERROR;
-                // }
-
-                // push(NUMBER_VAL(-AS_NUMBER(pop())));
                 break;
 
             case OP_CONSTANT: {
@@ -541,19 +515,6 @@ static InterpretResult run() {
                 push(constant);
                 break;
             }
-
-            // case OP_EQUAL: {
-            //     Value b = pop();
-            //     Value a = pop();
-            //     push(BOOL_VAL(valuesEqual(a, b)));
-            //     break;
-            // }
-            // case OP_NOT_EQUAL: {
-            //     Value b = pop();
-            //     Value a = pop();
-            //     push(BOOL_VAL(!valuesEqual(a, b)));
-            //     break;
-            // }
 
             case OP_NOT:    push(BOOL_VAL(isFalsey(pop()))); break;
             case OP_NIL:    push(NIL_VAL); break;
@@ -570,7 +531,6 @@ static InterpretResult run() {
 
 #undef READ_CONSTANT
 #undef READ_WORD
-#undef BINARY_OP
     return INTERPRET_RUNTIME_ERROR;
 }
 

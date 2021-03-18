@@ -112,23 +112,8 @@ DEF_TEST(freeChunk_no_error)
 
 END_TEST
 
-DEF_TEST(addConstant_no_error)
-    assert_int_equal(0,0);
-END_TEST
-
-DEF_TEST(getLine_no_error)
-    assert_int_equal(0, 0);
-END_TEST
-
-DEF_TEST(writeConstant_no_error)
-    assert_int_equal(0, 0);
-END_TEST
-
 DEF_TEST_MAIN("Chunk tests")
     ADD_TEST(initChunk_no_error);
     ADD_TEST(writeChunk_no_error);
     ADD_TEST(freeChunk_no_error);
-    ADD_TEST(addConstant_no_error);
-    ADD_TEST(getLine_no_error);
-    ADD_TEST(writeConstant_no_error);
 END_TEST_MAIN

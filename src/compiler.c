@@ -7,6 +7,7 @@
 #include "common.h"
 #include "compiler.h"
 #include "scanner.h"
+#include "object.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -27,7 +28,7 @@ typedef enum {
     PREC_EQUALITY,    // == !=
     PREC_COMPARISON,  // < > <= >=
     PREC_TERM,        // + -
-    PREC_FACTOR,      // * /
+    PREC_FACTOR,      // * / %
     PREC_UNARY,       // ! -
     PREC_CALL,        // . ()
     PREC_PRIMARY
@@ -226,6 +227,12 @@ static void inum() {
     emitConstant(INUM_VAL(value));
 }
 
+static void string() {
+
+    emitConstant(OBJ_VAL((Obj*)copyString(parser.previous.start + 1,
+                parser.previous.length - 2)));
+}
+
 static void unary() {
 
     TokenType operatorType = parser.previous.type;
@@ -264,7 +271,7 @@ ParseRule rules[] = {
     [TOKEN_LESS]          = {NULL,     binary, PREC_COMPARISON},
     [TOKEN_LESS_EQUAL]    = {NULL,     binary, PREC_COMPARISON},
     [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
-    [TOKEN_STRING]        = {NULL,     NULL,   PREC_NONE},
+    [TOKEN_STRING]        = {string,   NULL,   PREC_NONE},
     [TOKEN_FNUM]          = {fnum,     NULL,   PREC_NONE},
     [TOKEN_UNUM]          = {unum,     NULL,   PREC_NONE},
     [TOKEN_INUM]          = {inum,     NULL,   PREC_NONE},

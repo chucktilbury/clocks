@@ -7,6 +7,7 @@
 #include "common.h"
 #include "memory.h"
 #include "value.h"
+#include "object.h"
 
 void initValueArray(ValueArray* array) {
 
@@ -37,8 +38,6 @@ void freeValueArray(ValueArray* array) {
 /**
     @brief Print the value.
 
-    TODO?? Show the type somehow?
-
     @param value
 **/
 void printValue(Value value) {
@@ -49,6 +48,7 @@ void printValue(Value value) {
         case VAL_FNUM: printf("%0.3lf", AS_FNUM(value)); break; // clarity is important
         case VAL_UNUM: printf("0x%lx", AS_UNUM(value)); break;
         case VAL_INUM: printf("%ld", AS_INUM(value)); break;
+        case VAL_OBJ: printObject(value); break;
     }
 }
 

@@ -114,7 +114,12 @@ Chapter 18 Values
     parser?
 10. Add unified error messages.
 
-Time to begin unit testing....
+Time to begin unit testing.... (update) Unit testing seems like a rathole at
+this point. I am leaving in the framework for now, but I am considering
+deleting it and just going with functional testing only.
+
+Chapter 19 Strings
+1.
 
 ---------------
 Procedure to add a keyword to the scanner

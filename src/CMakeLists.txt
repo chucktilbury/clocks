@@ -11,6 +11,7 @@ add_executable( ${PROJECT_NAME}
     vm.c
     compiler.c
     scanner.c
+    object.c
 )
 
 target_link_libraries( ${PROJECT_NAME}
