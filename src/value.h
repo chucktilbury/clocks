@@ -1,67 +1,100 @@
-/**
-    @file value.h
+#ifndef clox_value_h
+#define clox_value_h
 
-    @brief
+#include "common.h"
 
-**/
-#ifndef __VALUE_H__
-#define __VALUE_H__
+typedef struct sObj Obj;
+typedef struct sObjString ObjString;
 
-typedef struct Obj Obj;
-typedef struct ObjString ObjString;
+#ifdef NAN_BOXING
+
+#define SIGN_BIT ((uint64_t)0x8000000000000000)
+#define QNAN     ((uint64_t)0x7ffc000000000000)
+
+#define TAG_NIL   1 // 01.
+#define TAG_FALSE 2 // 10.
+#define TAG_TRUE  3 // 11.
+
+typedef uint64_t Value;
+
+#define IS_BOOL(v)      (((v) & FALSE_VAL) == FALSE_VAL)
+#define IS_NIL(v)       ((v) == NIL_VAL)
+#define IS_NUMBER(v)    (((v) & QNAN) != QNAN)
+#define IS_OBJ(v)       (((v) & (QNAN | SIGN_BIT)) == (QNAN | SIGN_BIT))
+
+#define AS_BOOL(v)      ((v) == TRUE_VAL)
+#define AS_NUMBER(v)    valueToNum(v)
+#define AS_OBJ(v)       ((Obj*)(uintptr_t)((v) & ~(SIGN_BIT | QNAN)))
+
+#define BOOL_VAL(b)     ((b) ? TRUE_VAL : FALSE_VAL)
+#define FALSE_VAL       ((Value)(uint64_t)(QNAN | TAG_FALSE))
+#define TRUE_VAL        ((Value)(uint64_t)(QNAN | TAG_TRUE))
+#define NIL_VAL         ((Value)(uint64_t)(QNAN | TAG_NIL))
+#define NUMBER_VAL(num) numToValue(num)
+#define OBJ_VAL(obj) \
+    (Value)(SIGN_BIT | QNAN | (uint64_t)(uintptr_t)(obj))
+
+typedef union {
+  uint64_t bits;
+  double num;
+} DoubleUnion;
+
+static inline double valueToNum(Value value) {
+  DoubleUnion data;
+  data.bits = value;
+  return data.num;
+}
+
+static inline Value numToValue(double num) {
+  DoubleUnion data;
+  data.num = num;
+  return data.bits;
+}
+
+#else
 
 typedef enum {
-    VAL_FNUM,   // must be first see binary_op.c
-    VAL_INUM,   // must be second see binary_op.c
-    VAL_UNUM,   // must be third see binary_op.c
-    VAL_BOOL,
-    VAL_NIL,
-    VAL_OBJ,
+  VAL_BOOL,
+  VAL_NIL, // [user-types]
+  VAL_NUMBER,
+  VAL_OBJ
 } ValueType;
 
 typedef struct {
-    ValueType type;
-    union {
-        bool boolean;
-        double fnum;
-        uint64_t unum;
-        int64_t inum;
-        Obj* obj;
-    } as;
+  ValueType type;
+  union {
+    bool boolean;
+    double number;
+    Obj* obj;
+  } as; // [as]
 } Value;
 
-#define BOOL_VAL(value) ((Value){VAL_BOOL, {.boolean = value}})
-#define NIL_VAL         ((Value){VAL_NIL, {.unum = 0}})
-#define FNUM_VAL(value) ((Value){VAL_FNUM, {.fnum = value}})
-#define UNUM_VAL(value) ((Value){VAL_UNUM, {.unum = value}})
-#define INUM_VAL(value) ((Value){VAL_INUM, {.inum = value}})
-#define OBJ_VAL(value)  ((Value){VAL_OBJ, {.obj = value}})
+#define IS_BOOL(value)    ((value).type == VAL_BOOL)
+#define IS_NIL(value)     ((value).type == VAL_NIL)
+#define IS_NUMBER(value)  ((value).type == VAL_NUMBER)
+#define IS_OBJ(value)     ((value).type == VAL_OBJ)
 
-#define AS_BOOL(value)  ((value).as.boolean)
-#define AS_FNUM(value)  ((value).as.fnum)
-#define AS_UNUM(value)  ((value).as.unum)
-#define AS_INUM(value)  ((value).as.inum)
-#define AS_OBJ(value)   ((value).as.obj)
+#define AS_OBJ(value)     ((value).as.obj)
+#define AS_BOOL(value)    ((value).as.boolean)
+#define AS_NUMBER(value)  ((value).as.number)
 
-#define IS_BOOL(value)  ((value).type == VAL_BOOL)
-#define IS_NIL(value)   ((value).type == VAL_NIL)
-#define IS_FNUM(value)  ((value).type == VAL_FNUM)
-#define IS_UNUM(value)  ((value).type == VAL_UNUM)
-#define IS_INUM(value)  ((value).type == VAL_INUM)
-#define IS_OBJ(value)   ((value).type == VAL_OBJ)
+#define BOOL_VAL(value)   ((Value){ VAL_BOOL, { .boolean = value } })
+#define NIL_VAL           ((Value){ VAL_NIL, { .number = 0 } })
+#define NUMBER_VAL(value) ((Value){ VAL_NUMBER, { .number = value } })
+#define OBJ_VAL(object)   ((Value){ VAL_OBJ, { .obj = (Obj*)object } })
 
-#define VALUE_TYPE(value) ((value).type)
+#endif
 
 typedef struct {
-    int capacity;
-    int count;
-    Value* values;
+  int capacity;
+  int count;
+  Value* values;
 } ValueArray;
 
+bool valuesEqual(Value a, Value b);
 void initValueArray(ValueArray* array);
 void writeValueArray(ValueArray* array, Value value);
 void freeValueArray(ValueArray* array);
 void printValue(Value value);
-bool valuesEqual(Value a, Value b);
 
 #endif

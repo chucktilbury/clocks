@@ -1,16 +1,10 @@
-/**
-    @file compiler.h
+#ifndef clox_compiler_h
+#define clox_compiler_h
 
-    @brief
-
-**/
-#ifndef __COMPILER_H__
-#define __COMPILER_H__
-
-#include "chunk.h"
 #include "object.h"
 #include "vm.h"
 
-bool compile(const char* source, Chunk* chunk);
+ObjFunction* compile(const char* source);
+void markCompilerRoots();
 
 #endif

@@ -1,127 +1,24 @@
 
 These are notes that I have made to remember and analyse future enhancements.
 
-General:
-1.  Planned features not covered in the book (in order of importance):
-    1.  Implement signed and unsigned integers as 64 bit objects.
-        1.  VM instructions.
-        2.  Scanner modifications.
-        3.  Parser modifications.
-        4.  Compiler modifications.
-    2.  Formatting strings. Anywhere a string is accepted, a formatted string
-        should be as well.
-        1.  What do formatted strings look like?
-        2.  When does formatting happen during parse?
-    3.  Look into implementing exceptions. This looks complicated. Requires
-        direct support in the parser and in the VM.
-    4.  Method overloading by parameter type is not possible because the
-        language is dynamically typed, but should be able to do default values
-        like Python does.
-    5.  Operator overloading. This could be done on a limited basis, but it
-        requires direct support in the parser.
-    6.  Arrays, Hashes, and Maps could be supported by operator overloading.
-        1.  What are the implications of not having pointers?
-        2.  Direct support in the parser?
-    7.  Consider replacing the C runtime heap with one of my own. Look at the
-        runtime and a couple of other implementation.
-        1.  Implications for GC?
-        2.  How does sbrk() work? Portability?
-        3.  Only do it if a stripped down version can improve performance.
-2.  Plans to document all syntax using syntax diagrams.
-3.  Plans to document all instructions for VM and their function.
-4.  Unit and functional tests.
-5.  Command line parser and configuration.
-6.  Understand type casts and coercion in the context of this language.
-7.  Fix the way the scanner reads the source. Currently it reads the entire
-    file in one read. It needs to read the file one line at a time such that
-    things like strings can span a line.
-    1. Think about the implications for not allowing strings to span lines.
+Planned features: (no order)
+1. Use ReadLine library for REPL functionality.
+2. Use command line and configuration library routine for CLI.
+3. Implement import functionality.
+4. Implement signed and unsigned integer types.
+5. Exceptions.
+6. Operator overloads.
+7. Array, Hash, and Map types.
+8. Type casts.
+9. Runtime including at minimum, stdio and math.
+10 Runtime library for GUI interface.
+11 Graphical debugger.
+12 Editor and IDE.
 
-Chapter 14
-1.  Implement challenges 1 and 2 at the end.
-2.  Add signed and unsigned integers to the type system. Waiting until I
-    see strings added as a value.
+TODO list:
+1. Driver for all language tests.
+2. Document all syntax using syntax diagrams.
+3. Doxygen for all functions in code.
+4. Complete README for all features.
+5. Implement features.
 
-Chapter 15
-1.  Challenges:
-    1.  Add code to grow the VM stack.
-    2.  Keep separate instructions for negate and subtract.
-    3.  Keep an eye on how many instructions are being used. May have to look
-        adding support for variable length instructions.
-2.  Note that when an object is popped from the stack, its memory is no longer
-    accessible.
-3.  When adding the signed and unsigned integer types, will have to:
-    1.  Add instructions for arithmetic operations and for storing them.
-    2.  Debugger additions.
-    3.  VM changes to support the types.
-    Still waiting to add another type of value to the values.c file to see
-    wether to add separate files for that or to do it all in values.c/.h.
-4.  Consider separating the VM such that it could accept a stream of
-    instructions from somewhere other than the internal generator.
-5.  Consider changing the VM to be register based, rather than stack based.
-
-Chapter 16
-1.  (done) Use readline library for REPL.
-2.  (done)Implement multi-line comments in scanner.c in skipWhitespace().
-3.  To implement integer types, modify scanner.c, cloning number() in
-    scanner.c.
-4.  Augment string() in scanner.c to handle escapes and absolute literals.
-    1. Single quote vs double quote.
-5.  Formatted strings are done in scanner? (probably not) Look at challenge
-    number 1 at end of chapter. Doing that in the scanner will need to have
-    the scanner call the parser, and that may not be such a good idea. On the
-    other hand, post-processing a string in the parser is not that great an
-    idea either.
-6.  Replace isAlpha() and isDigit() with the ctype.h functions.
-
-Thought: Start the type system modifications from the scanner, then do the
-parser, then the VM. It seems best to wait until most of the code from the
-book is in the system before starting the modifications.
-
-Chapter 17 Compiler
-1.  Compiler, parser, and emitter are all lumped into one file. Look at
-    dividing that into files by function. Wait until finished with the book.
-2.  Condense code to get rid of superfluous helper functions. (performance)
-    That can happen after all of the code is written. One-liners can be
-    merged. Until then, it could be a mistake.
-3.  Time to add support for some of the items above.
-    1. (done) Multi-line comments.
-    2. (done) Strings that are enclosed with '\"' support escape codes,
-        strings that are enclosed with '\'' are absolute literals. TOK_STRING
-        is returned for both.
-    3. (done) Chapter 14 challenges 1 and 2
-    4. (done) Dynamic growth of the VM stack
-    5. (done) Replace isAlpha() and isDigit() with the ctype.h functions.
-4.  Next chapter works with values, so do the integers after that.
-
-Chapter 18 Values
-1.  (done) Undo the OP_LONG_CONSTANT changes.
-2.  (done) Change the VM stack IP to 16 bits. The stack itself changes from 8
-    bits to 16 bits and all stack elements change from 8 to 16 bits.
-    1. Change references to things like READ_BYTE() to READ_WORD().
-3.  (not possible) Change the macros in run() to static inline functions where
-    possible.
-    1.  GCC forced inline Example:
-        "static inline int fn() __attribute__((always_inline)) { ... }"
-    2.  Clang does not appear to have a way to reliably force inline and MSVC
-        is dead to me.
-4.  (done) Add not equal, greater equal, and less equal instructions.
-5.  (done) Add modulo operator.
-6.  (done) Add integer instructions and values.
-7.  (done) Add 'not' keyword to replace '!' for comparisons. (implemented both)
-8.  Convert error routines to use stdargs.
-9.  Think about type casting values. What does it mean? Implement in VM or in
-    parser?
-10. Add unified error messages.
-
-Time to begin unit testing.... (update) Unit testing seems like a rathole at
-this point. I am leaving in the framework for now, but I am considering
-deleting it and just going with functional testing only.
-
-Chapter 19 Strings
-1.
-
----------------
-Procedure to add a keyword to the scanner
-1. Add the token to the scanner.h
-2. Modify identifierType() to recognize the string.

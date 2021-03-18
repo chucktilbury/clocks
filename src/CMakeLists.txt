@@ -2,17 +2,19 @@
 project(clocks)
 
 add_executable( ${PROJECT_NAME}
-    main.c
-    log.c
     chunk.c
-    memory.c
+    compiler.c
     debug.c
+    main.c
+    memory.c
+    object.c
+    scanner.c
+    table.c
     value.c
     vm.c
-    compiler.c
-    scanner.c
-    object.c
+    #log.c
 )
+
 
 target_link_libraries( ${PROJECT_NAME}
     readline
@@ -27,4 +29,3 @@ target_include_directories( ${PROJECT_NAME}
 target_compile_options( ${PROJECT_NAME}
     PRIVATE "-Wall" "-Wextra" "-g" "-D_DEBUGGING" "-std=c99"
 )
-
