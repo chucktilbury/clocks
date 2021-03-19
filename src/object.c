@@ -1,3 +1,9 @@
+/**
+    @file object.c
+
+    @brief
+
+**/
 #include <stdio.h>
 #include <string.h>
 
@@ -10,6 +16,13 @@
 #define ALLOCATE_OBJ(type, objectType) \
     (type*)allocateObject(sizeof(type), objectType)
 
+/**
+    @brief
+
+    @param size
+    @param type
+    @return Obj*
+**/
 static Obj* allocateObject(size_t size, ObjType type) {
   Obj* object = (Obj*)reallocate(NULL, 0, size);
   object->type = type;
@@ -24,6 +37,14 @@ static Obj* allocateObject(size_t size, ObjType type) {
 
   return object;
 }
+
+/**
+    @brief
+
+    @param receiver
+    @param method
+    @return ObjBoundMethod*
+**/
 ObjBoundMethod* newBoundMethod(Value receiver, ObjClosure* method) {
   ObjBoundMethod* bound = ALLOCATE_OBJ(ObjBoundMethod,
                                        OBJ_BOUND_METHOD);
@@ -31,12 +52,26 @@ ObjBoundMethod* newBoundMethod(Value receiver, ObjClosure* method) {
   bound->method = method;
   return bound;
 }
+
+/**
+    @brief
+
+    @param name
+    @return ObjClass*
+**/
 ObjClass* newClass(ObjString* name) {
   ObjClass* klass = ALLOCATE_OBJ(ObjClass, OBJ_CLASS);
   klass->name = name; // [klass]
   initTable(&klass->methods);
   return klass;
 }
+
+/**
+    @brief
+
+    @param function
+    @return ObjClosure*
+**/
 ObjClosure* newClosure(ObjFunction* function) {
   ObjUpvalue** upvalues = ALLOCATE(ObjUpvalue*, function->upvalueCount);
   for (int i = 0; i < function->upvalueCount; i++) {
@@ -49,6 +84,12 @@ ObjClosure* newClosure(ObjFunction* function) {
   closure->upvalueCount = function->upvalueCount;
   return closure;
 }
+
+/**
+    @brief
+
+    @return ObjFunction*
+**/
 ObjFunction* newFunction() {
   ObjFunction* function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
 
@@ -58,18 +99,40 @@ ObjFunction* newFunction() {
   initChunk(&function->chunk);
   return function;
 }
+
+/**
+    @brief
+
+    @param klass
+    @return ObjInstance*
+**/
 ObjInstance* newInstance(ObjClass* klass) {
   ObjInstance* instance = ALLOCATE_OBJ(ObjInstance, OBJ_INSTANCE);
   instance->klass = klass;
   initTable(&instance->fields);
   return instance;
 }
+
+/**
+    @brief
+
+    @param function
+    @return ObjNative*
+**/
 ObjNative* newNative(NativeFn function) {
   ObjNative* native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
   native->function = function;
   return native;
 }
 
+/**
+    @brief
+
+    @param chars
+    @param length
+    @param hash
+    @return ObjString*
+**/
 static ObjString* allocateString(char* chars, int length,
                                  uint32_t hash) {
   ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
@@ -83,6 +146,14 @@ static ObjString* allocateString(char* chars, int length,
 
   return string;
 }
+
+/**
+    @brief
+
+    @param key
+    @param length
+    @return uint32_t
+**/
 static uint32_t hashString(const char* key, int length) {
   uint32_t hash = 2166136261u;
 
@@ -93,6 +164,14 @@ static uint32_t hashString(const char* key, int length) {
 
   return hash;
 }
+
+/**
+    @brief
+
+    @param chars
+    @param length
+    @return ObjString*
+**/
 ObjString* takeString(char* chars, int length) {
   uint32_t hash = hashString(chars, length);
   ObjString* interned = tableFindString(&vm.strings, chars, length,
@@ -104,6 +183,14 @@ ObjString* takeString(char* chars, int length) {
 
   return allocateString(chars, length, hash);
 }
+
+/**
+    @brief
+
+    @param chars
+    @param length
+    @return ObjString*
+**/
 ObjString* copyString(const char* chars, int length) {
   uint32_t hash = hashString(chars, length);
   ObjString* interned = tableFindString(&vm.strings, chars, length,
@@ -116,6 +203,13 @@ ObjString* copyString(const char* chars, int length) {
 
   return allocateString(heapChars, length, hash);
 }
+
+/**
+    @brief
+
+    @param slot
+    @return ObjUpvalue*
+**/
 ObjUpvalue* newUpvalue(Value* slot) {
   ObjUpvalue* upvalue = ALLOCATE_OBJ(ObjUpvalue, OBJ_UPVALUE);
   upvalue->closed = NIL_VAL;
@@ -123,6 +217,12 @@ ObjUpvalue* newUpvalue(Value* slot) {
   upvalue->next = NULL;
   return upvalue;
 }
+
+/**
+    @brief
+
+    @param function
+**/
 static void printFunction(ObjFunction* function) {
   if (function->name == NULL) {
     printf("<script>");
@@ -130,6 +230,12 @@ static void printFunction(ObjFunction* function) {
   }
   printf("<fn %s>", function->name->chars);
 }
+
+/**
+    @brief
+
+    @param value
+**/
 void printObject(Value value) {
   switch (OBJ_TYPE(value)) {
     case OBJ_CLASS:

@@ -1,3 +1,9 @@
+/**
+    @file table.c
+
+    @brief
+
+**/
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,17 +14,37 @@
 
 #define TABLE_MAX_LOAD 0.75
 
+/**
+    @brief
+
+    @param table
+**/
 void initTable(Table* table) {
   table->count = 0;
   table->capacity = -1;
   table->entries = NULL;
 }
+
+/**
+    @brief
+
+    @param table
+**/
 void freeTable(Table* table) {
   FREE_ARRAY(Entry, table->entries, table->capacity + 1);
   initTable(table);
 }
+
 // NOTE: The "Optimization" chapter has a manual copy of this function.
 // If you change it here, make sure to update that copy.
+/**
+    @brief
+
+    @param entries
+    @param capacity
+    @param key
+    @return Entry*
+**/
 static Entry* findEntry(Entry* entries, int capacity,
                         ObjString* key) {
   uint32_t index = key->hash & capacity;
@@ -43,6 +69,16 @@ static Entry* findEntry(Entry* entries, int capacity,
     index = (index + 1) & capacity;
   }
 }
+
+/**
+    @brief
+
+    @param table
+    @param key
+    @param value
+    @return true
+    @return false
+**/
 bool tableGet(Table* table, ObjString* key, Value* value) {
   if (table->count == 0) return false;
 
@@ -52,6 +88,13 @@ bool tableGet(Table* table, ObjString* key, Value* value) {
   *value = entry->value;
   return true;
 }
+
+/**
+    @brief
+
+    @param table
+    @param capacity
+**/
 static void adjustCapacity(Table* table, int capacity) {
   Entry* entries = ALLOCATE(Entry, capacity + 1);
   for (int i = 0; i <= capacity; i++) {
@@ -74,6 +117,16 @@ static void adjustCapacity(Table* table, int capacity) {
   table->entries = entries;
   table->capacity = capacity;
 }
+
+/**
+    @brief
+
+    @param table
+    @param key
+    @param value
+    @return true
+    @return false
+**/
 bool tableSet(Table* table, ObjString* key, Value value) {
   if (table->count + 1 > (table->capacity + 1) * TABLE_MAX_LOAD) {
     int capacity = GROW_CAPACITY(table->capacity + 1) - 1;
@@ -89,6 +142,15 @@ bool tableSet(Table* table, ObjString* key, Value value) {
   entry->value = value;
   return isNewKey;
 }
+
+/**
+    @brief
+
+    @param table
+    @param key
+    @return true
+    @return false
+**/
 bool tableDelete(Table* table, ObjString* key) {
   if (table->count == 0) return false;
 
@@ -102,6 +164,13 @@ bool tableDelete(Table* table, ObjString* key) {
 
   return true;
 }
+
+/**
+    @brief
+
+    @param from
+    @param to
+**/
 void tableAddAll(Table* from, Table* to) {
   for (int i = 0; i <= from->capacity; i++) {
     Entry* entry = &from->entries[i];
@@ -110,6 +179,16 @@ void tableAddAll(Table* from, Table* to) {
     }
   }
 }
+
+/**
+    @brief
+
+    @param table
+    @param chars
+    @param length
+    @param hash
+    @return ObjString*
+**/
 ObjString* tableFindString(Table* table, const char* chars, int length,
                            uint32_t hash) {
   if (table->count == 0) return NULL;
@@ -132,6 +211,12 @@ ObjString* tableFindString(Table* table, const char* chars, int length,
     index = (index + 1) & table->capacity;
   }
 }
+
+/**
+    @brief
+
+    @param table
+**/
 void tableRemoveWhite(Table* table) {
   for (int i = 0; i <= table->capacity; i++) {
     Entry* entry = &table->entries[i];
@@ -140,6 +225,12 @@ void tableRemoveWhite(Table* table) {
     }
   }
 }
+
+/**
+    @brief
+
+    @param table
+**/
 void markTable(Table* table) {
   for (int i = 0; i <= table->capacity; i++) {
     Entry* entry = &table->entries[i];

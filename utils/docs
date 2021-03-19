@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [ -z $CLOCKS_ROOT_DIR ]; then
+    echo "error: Clocks environment not set. Run setup."
+    exit
+fi
+
+if [ -z $1 ]; then
+    firefox --new-window $CLOCKS_ROOT_DIR/docs/out/html/index.html
+elif [ "$1" != "on" -a "$1" != "off" ]; then
+    echo "error: Acceptible parameters are 'on' and 'off' "
+    exit
+else
+    cd $CLOCKS_ROOT_DIR/build
+    cmake -DBUILD_DOCS=$1 ..
+fi

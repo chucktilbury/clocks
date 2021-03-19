@@ -1,3 +1,9 @@
+/**
+    @file object.h
+
+    @brief
+
+**/
 #ifndef clox_object_h
 #define clox_object_h
 

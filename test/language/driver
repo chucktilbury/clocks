@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+
+import sys, os, re
+import subprocess
+import argparse
+
+exec_name = 'clocks'
+errors = 0
+tests = 0
+dir_list = ['assignment',
+            'block',
+            'call',
+            'closure',
+            'comments',
+            'field',
+            'function',
+            'inheritance',
+            'logical_operator',
+            'misc',
+            'number',
+            'print',
+            'return',
+            'string',
+            'this',
+            'while',
+            #'benchmark',
+            'bool',
+            'class',
+            'constructor',
+            'expressions',
+            'for',
+            'if',
+            'limit',
+            'method',
+            'nil',
+            'operator',
+            'regression',
+            'scanning',
+            'super',
+            'variable',
+           ]
+
+def verbosity(num, str) :
+    if args.verbose >= num:
+        sys.stdout.write(str)
+        sys.stdout.flush()
+
+def compare(txt, fname) :
+
+    with open(fname, 'rt') as fp :
+        lines = fp.readlines()
+        return (txt == lines)
+
+def create_expect(txt, fname) :
+
+    #if not os.path.isfile(fname) :
+    with open(fname, 'wt') as fp :
+        fp.write(str(txt))
+
+def make_names(indir, dlist) :
+
+    outval = []
+    for subdir in dlist :
+        dname = os.path.join(indir, subdir)
+        flist = os.listdir(dname)
+        for filename in flist :
+            x = filename.find('.lox')
+            if x > 0 :
+                outval.append(os.path.join(dname, filename))
+
+    return outval
+
+def do_test(names, create) :
+
+    global tests, errors
+    verbosity(3, "Do all of the tests\n")
+    for fname in names:
+        tests = tests + 1
+        testfile = fname.replace(".lox", ".expect")
+        runfile = fname.replace(".lox", ".run")
+        failfile = fname.replace(".lox", ".fail")
+
+        if create :
+            os.system("%s %s > %s 2>&1" % (exec_name, fname, testfile))
+
+        os.system("%s %s > %s 2>&1"%(exec_name, fname, runfile))
+        ret = os.system("diff %s %s > %s 2>&1"%(runfile, testfile, failfile))
+
+        if ret != 0 :
+            errors += 1
+            verbosity(1, "fail: %s\n"%(fname))
+            os.system("diff %s %s" % (runfile, testfile))
+        else :
+            verbosity(1, "pass: %s\n"%(fname))
+            os.unlink(failfile)
+
+        os.unlink(runfile)
+
+if __name__ == '__main__' :
+
+    desc = 'Run all language tests and evaluate the result.'
+    par = argparse.ArgumentParser(description=desc)
+    par.add_argument('-c', help='create expect file if one does not exist', dest='create', action='store_true')
+    par.add_argument('-d', help='directory to take files from', type=str, dest='indir')
+    par.add_argument('-v', help='print more status as it runs', dest='verbose', default=0, required=False, action='count')
+    args = par.parse_args()
+
+    dir_name = os.environ.get('CLOCKS_ROOT_DIR')
+    if dir_name == None:
+        sys.stderr.write("error: CLOCKS_ROOT_DIR environment var not found\n")
+        exit(1)
+
+    verbosity(2, "CLOCKS_ROOT_DIR = \"%s\"\n" % (dir_name))
+    do_dir = os.path.join(dir_name, "test", "language")
+
+    if not args.indir is None:
+        dlist = [args.indir]
+    else:
+        dlist = dir_list
+
+    do_test(make_names(do_dir, dlist), args.create)
+
+    sys.stdout.write("%d tests passed, %d tests failed\n\n" %(tests-errors, errors))
+    if errors == 0:
+        exit(0)
+    else:
+        exit(1)
+
+

@@ -1,3 +1,9 @@
+/**
+    @file compiler.c
+
+    @brief Parser and compiler combined.
+
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,10 +51,12 @@ typedef struct {
   int depth;
   bool isCaptured;
 } Local;
+
 typedef struct {
   uint8_t index;
   bool isLocal;
 } Upvalue;
+
 typedef enum {
   TYPE_FUNCTION,
   TYPE_INITIALIZER,
@@ -372,6 +380,7 @@ static uint8_t argumentList() {
   return argCount;
 }
 static void and_(bool canAssign) {
+  (void)canAssign;
   int endJump = emitJump(OP_JUMP_IF_FALSE);
 
   emitByte(OP_POP);
@@ -380,6 +389,7 @@ static void and_(bool canAssign) {
   patchJump(endJump);
 }
 static void binary(bool canAssign) {
+  (void)canAssign;
   // Remember the operator.
   TokenType operatorType = parser.previous.type;
 
@@ -404,6 +414,7 @@ static void binary(bool canAssign) {
   }
 }
 static void call(bool canAssign) {
+  (void)canAssign;
   uint8_t argCount = argumentList();
   emitBytes(OP_CALL, argCount);
 }
@@ -423,6 +434,7 @@ static void dot(bool canAssign) {
   }
 }
 static void literal(bool canAssign) {
+  (void)canAssign;
   switch (parser.previous.type) {
     case TOKEN_FALSE: emitByte(OP_FALSE); break;
     case TOKEN_NIL: emitByte(OP_NIL); break;
@@ -432,14 +444,17 @@ static void literal(bool canAssign) {
   }
 }
 static void grouping(bool canAssign) {
+  (void)canAssign;
   expression();
   consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
 }
 static void number(bool canAssign) {
+  (void)canAssign;
   double value = strtod(parser.previous.start, NULL);
   emitConstant(NUMBER_VAL(value));
 }
 static void or_(bool canAssign) {
+  (void)canAssign;
   int elseJump = emitJump(OP_JUMP_IF_FALSE);
   int endJump = emitJump(OP_JUMP);
 
@@ -450,6 +465,7 @@ static void or_(bool canAssign) {
   patchJump(endJump);
 }
 static void string(bool canAssign) {
+  (void)canAssign;
   emitConstant(OBJ_VAL(copyString(parser.previous.start + 1,
                                   parser.previous.length - 2)));
 }
@@ -485,6 +501,7 @@ static Token syntheticToken(const char* text) {
   return token;
 }
 static void super_(bool canAssign) {
+  (void)canAssign;
   if (currentClass == NULL) {
     error("Cannot use 'super' outside of a class.");
   } else if (!currentClass->hasSuperclass) {
@@ -507,6 +524,7 @@ static void super_(bool canAssign) {
   }
 }
 static void this_(bool canAssign) {
+  (void)canAssign;
   if (currentClass == NULL) {
     error("Cannot use 'this' outside of a class.");
     return;
@@ -514,6 +532,7 @@ static void this_(bool canAssign) {
   variable(false);
 } // [this]
 static void unary(bool canAssign) {
+  (void)canAssign;
   TokenType operatorType = parser.previous.type;
 
   // Compile the operand.

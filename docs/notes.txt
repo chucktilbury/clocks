@@ -2,23 +2,29 @@
 These are notes that I have made to remember and analyse future enhancements.
 
 Planned features: (no order)
-1. Use ReadLine library for REPL functionality.
-2. Use command line and configuration library routine for CLI.
-3. Implement import functionality.
-4. Implement signed and unsigned integer types.
-5. Exceptions.
-6. Operator overloads.
-7. Array, Hash, and Map types.
-8. Type casts.
-9. Runtime including at minimum, stdio and math.
-10 Runtime library for GUI interface.
-11 Graphical debugger.
-12 Editor and IDE.
+  1 Use ReadLine library for REPL functionality.
+  2 Use command line and configuration library routine for CLI.
+  3 Multi-line comments
+  4 Implement import functionality.
+  5 Implement modulo operator.
+  6 Implement signed and unsigned integer types.
+  7 Exceptions.
+  8 Operator overloads.
+  9 Array, Hash, and Map types.
+ 10 Type casts.
+ 11 Double/Single quote strings.
+ 12 Formatted strings.
+ 13 Runtime including at minimum, stdio and math.
+ 14 Runtime library for GUI interface.
+ 15 Graphical debugger.
+ 16 Editor and IDE.
 
 TODO list:
-1. Driver for all language tests.
-2. Document all syntax using syntax diagrams.
-3. Doxygen for all functions in code.
-4. Complete README for all features.
-5. Implement features.
+  1 Apply all of the challenges.
+  2 Driver for all language tests.
+  3 Document all syntax using syntax diagrams.
+  4 Doxygen for all functions in code.
+  5 Complete README for all features.
+  6 Implement features.
+
 

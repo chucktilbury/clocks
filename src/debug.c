@@ -1,9 +1,21 @@
+/**
+    @file debug.c
+
+    @brief
+
+**/
 #include <stdio.h>
 
 #include "debug.h"
 #include "object.h"
 #include "value.h"
 
+/**
+    @brief
+
+    @param chunk
+    @param name
+**/
 void disassembleChunk(Chunk* chunk, const char* name) {
   printf("== %s ==\n", name);
 
@@ -11,6 +23,15 @@ void disassembleChunk(Chunk* chunk, const char* name) {
     offset = disassembleInstruction(chunk, offset);
   }
 }
+
+/**
+    @brief
+
+    @param name
+    @param chunk
+    @param offset
+    @return int
+**/
 static int constantInstruction(const char* name, Chunk* chunk,
                                int offset) {
   uint8_t constant = chunk->code[offset + 1];
@@ -19,6 +40,15 @@ static int constantInstruction(const char* name, Chunk* chunk,
   printf("'\n");
   return offset + 2;
 }
+
+/**
+    @brief
+
+    @param name
+    @param chunk
+    @param offset
+    @return int
+**/
 static int invokeInstruction(const char* name, Chunk* chunk,
                                 int offset) {
   uint8_t constant = chunk->code[offset + 1];
@@ -28,15 +58,42 @@ static int invokeInstruction(const char* name, Chunk* chunk,
   printf("'\n");
   return offset + 3;
 }
+
+/**
+    @brief
+
+    @param name
+    @param offset
+    @return int
+**/
 static int simpleInstruction(const char* name, int offset) {
   printf("%s\n", name);
   return offset + 1;
 }
+
+/**
+    @brief
+
+    @param name
+    @param chunk
+    @param offset
+    @return int
+**/
 static int byteInstruction(const char* name, Chunk* chunk, int offset) {
   uint8_t slot = chunk->code[offset + 1];
   printf("%-16s %4d\n", name, slot);
   return offset + 2; // [debug]
 }
+
+/**
+    @brief
+
+    @param name
+    @param sign
+    @param chunk
+    @param offset
+    @return int
+**/
 static int jumpInstruction(const char* name, int sign, Chunk* chunk,
                            int offset) {
   uint16_t jump = (uint16_t)(chunk->code[offset + 1] << 8);
@@ -44,6 +101,14 @@ static int jumpInstruction(const char* name, int sign, Chunk* chunk,
   printf("%-16s %4d -> %d\n", name, offset, offset + 3 + sign * jump);
   return offset + 3;
 }
+
+/**
+    @brief
+
+    @param chunk
+    @param offset
+    @return int
+**/
 int disassembleInstruction(Chunk* chunk, int offset) {
   printf("%04d ", offset);
   if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {

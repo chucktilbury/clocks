@@ -1,3 +1,9 @@
+/**
+    @file value.c
+
+    @brief
+
+**/
 #include <stdio.h>
 #include <string.h>
 
@@ -5,11 +11,23 @@
 #include "memory.h"
 #include "value.h"
 
+/**
+    @brief
+
+    @param array
+**/
 void initValueArray(ValueArray* array) {
   array->values = NULL;
   array->capacity = 0;
   array->count = 0;
 }
+
+/**
+    @brief
+
+    @param array
+    @param value
+**/
 void writeValueArray(ValueArray* array, Value value) {
   if (array->capacity < array->count + 1) {
     int oldCapacity = array->capacity;
@@ -21,10 +39,22 @@ void writeValueArray(ValueArray* array, Value value) {
   array->values[array->count] = value;
   array->count++;
 }
+
+/**
+    @brief
+
+    @param array
+**/
 void freeValueArray(ValueArray* array) {
   FREE_ARRAY(Value, array->values, array->capacity);
   initValueArray(array);
 }
+
+/**
+    @brief
+
+    @param value
+**/
 void printValue(Value value) {
 #ifdef NAN_BOXING
   if (IS_BOOL(value)) {
@@ -45,6 +75,15 @@ void printValue(Value value) {
   }
 #endif
 }
+
+/**
+    @brief
+
+    @param a
+    @param b
+    @return true
+    @return false
+**/
 bool valuesEqual(Value a, Value b) {
 #ifdef NAN_BOXING
   if (IS_NUMBER(a) && IS_NUMBER(b)) return AS_NUMBER(a) == AS_NUMBER(b);

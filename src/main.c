@@ -1,3 +1,9 @@
+/**
+    @file main.c
+
+    @brief
+
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +13,10 @@
 #include "debug.h"
 #include "vm.h"
 
+/**
+    @brief
+
+**/
 static void repl() {
   char line[1024];
   for (;;) {
@@ -20,6 +30,13 @@ static void repl() {
     interpret(line);
   }
 }
+
+/**
+    @brief
+
+    @param path
+    @return char*
+**/
 static char* readFile(const char* path) {
   FILE* file = fopen(path, "rb");
   if (file == NULL) {
@@ -48,6 +65,12 @@ static char* readFile(const char* path) {
   fclose(file);
   return buffer;
 }
+
+/**
+    @brief
+
+    @param path
+**/
 static void runFile(const char* path) {
   char* source = readFile(path);
   InterpretResult result = interpret(source);
@@ -57,6 +80,13 @@ static void runFile(const char* path) {
   if (result == INTERPRET_RUNTIME_ERROR) exit(70);
 }
 
+/**
+    @brief
+
+    @param argc
+    @param argv
+    @return int
+**/
 int main(int argc, const char* argv[]) {
   initVM();
 

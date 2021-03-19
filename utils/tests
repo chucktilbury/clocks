@@ -2,14 +2,14 @@
 # Turn building the tests on or off. Default is off.
 
 if [ -z $CLOCKS_ROOT_DIR ]; then
-    echo "Environment not set up. Run setup."
+    echo "error: Environment not set up. Run setup."
     exit
 fi
 
 if [ -z $1 ]; then
-    ctest -VV
+    ctest
 elif [ "$1" != "on" -a "$1" != "off" ]; then
-    echo "Acceptible parameters are 'on' and 'off' "
+    echo "error: Acceptible parameters are 'on' and 'off' "
     exit
 else
     cd $CLOCKS_ROOT_DIR/build

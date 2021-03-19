@@ -1,3 +1,9 @@
+/**
+    @file common.h
+
+    @brief Used by most of the other C files.
+
+**/
 #ifndef clox_common_h
 #define clox_common_h
 

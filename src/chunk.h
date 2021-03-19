@@ -1,9 +1,18 @@
+/**
+    @file chunk.h
+
+    @brief Header for chunks.
+
+**/
 #ifndef clox_chunk_h
 #define clox_chunk_h
 
 #include "common.h"
 #include "value.h"
 
+/**
+    @brief Instruction set for VM
+**/
 typedef enum {
   OP_CONSTANT,
   OP_NIL,
@@ -44,6 +53,9 @@ typedef enum {
   OP_METHOD
 } OpCode;
 
+/**
+    @brief Chunk data structure.
+**/
 typedef struct {
   int count;
   int capacity;

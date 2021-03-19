@@ -1,3 +1,9 @@
+/**
+    @file scanner.c
+
+    @brief
+
+**/
 #include <stdio.h>
 #include <string.h>
 
@@ -11,33 +17,88 @@ typedef struct {
 } Scanner;
 
 Scanner scanner;
+
+/**
+    @brief
+
+    @param source
+**/
 void initScanner(const char* source) {
   scanner.start = source;
   scanner.current = source;
   scanner.line = 1;
 }
+
+/**
+    @brief
+
+    @param c
+    @return true
+    @return false
+**/
 static bool isAlpha(char c) {
   return (c >= 'a' && c <= 'z') ||
          (c >= 'A' && c <= 'Z') ||
           c == '_';
 }
+
+/**
+    @brief
+
+    @param c
+    @return true
+    @return false
+**/
 static bool isDigit(char c) {
   return c >= '0' && c <= '9';
 }
+
+/**
+    @brief
+
+    @return true
+    @return false
+**/
 static bool isAtEnd() {
   return *scanner.current == '\0';
 }
+
+/**
+    @brief
+
+    @return char
+**/
 static char advance() {
   scanner.current++;
   return scanner.current[-1];
 }
+
+/**
+    @brief
+
+    @return char
+**/
 static char peek() {
   return *scanner.current;
 }
+
+/**
+    @brief
+
+    @return char
+**/
 static char peekNext() {
   if (isAtEnd()) return '\0';
   return scanner.current[1];
 }
+
+/**
+    @brief
+
+    @param expected
+    @return true
+    @return false
+**/
 static bool match(char expected) {
   if (isAtEnd()) return false;
   if (*scanner.current != expected) return false;
@@ -45,6 +106,13 @@ static bool match(char expected) {
   scanner.current++;
   return true;
 }
+
+/**
+    @brief
+
+    @param type
+    @return Token
+**/
 static Token makeToken(TokenType type) {
   Token token;
   token.type = type;
@@ -54,6 +122,13 @@ static Token makeToken(TokenType type) {
 
   return token;
 }
+
+/**
+    @brief
+
+    @param message
+    @return Token
+**/
 static Token errorToken(const char* message) {
   Token token;
   token.type = TOKEN_ERROR;
@@ -63,6 +138,11 @@ static Token errorToken(const char* message) {
 
   return token;
 }
+
+/**
+    @brief
+
+**/
 static void skipWhitespace() {
   for (;;) {
     char c = peek();
@@ -92,6 +172,16 @@ static void skipWhitespace() {
     }
   }
 }
+
+/**
+    @brief
+
+    @param start
+    @param length
+    @param rest
+    @param type
+    @return TokenType
+**/
 static TokenType checkKeyword(int start, int length,
     const char* rest, TokenType type) {
   if (scanner.current - scanner.start == start + length &&
@@ -101,6 +191,12 @@ static TokenType checkKeyword(int start, int length,
 
   return TOKEN_IDENTIFIER;
 }
+
+/**
+    @brief
+
+    @return TokenType
+**/
 static TokenType identifierType()
 {
   switch (scanner.start[0]) {
@@ -136,11 +232,23 @@ static TokenType identifierType()
 
   return TOKEN_IDENTIFIER;
 }
+
+/**
+    @brief
+
+    @return Token
+**/
 static Token identifier() {
   while (isAlpha(peek()) || isDigit(peek())) advance();
 
   return makeToken(identifierType());
 }
+
+/**
+    @brief
+
+    @return Token
+**/
 static Token number() {
   while (isDigit(peek())) advance();
 
@@ -154,6 +262,12 @@ static Token number() {
 
   return makeToken(TOKEN_NUMBER);
 }
+
+/**
+    @brief
+
+    @return Token
+**/
 static Token string() {
   while (peek() != '"' && !isAtEnd()) {
     if (peek() == '\n') scanner.line++;
@@ -166,6 +280,12 @@ static Token string() {
   advance();
   return makeToken(TOKEN_STRING);
 }
+
+/**
+    @brief
+
+    @return Token
+**/
 Token scanToken() {
   skipWhitespace();
 

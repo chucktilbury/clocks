@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-if [ ! -z $CLOCKS_ROOT_DIR ]; then
-    firefox --new-window $CLOCKS_ROOT_DIR/docs/out/html/index.html
-else
-    echo "error: clocks environment not set"
-fi

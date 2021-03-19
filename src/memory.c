@@ -1,3 +1,9 @@
+/**
+    @file memory.c
+
+    @brief
+
+**/
 #include <stdlib.h>
 
 #include "common.h"
@@ -12,6 +18,14 @@
 
 #define GC_HEAP_GROW_FACTOR 2
 
+/**
+    @brief
+
+    @param previous
+    @param oldSize
+    @param newSize
+    @return void*
+**/
 void* reallocate(void* previous, size_t oldSize, size_t newSize) {
   vm.bytesAllocated += newSize - oldSize;
 
@@ -32,6 +46,12 @@ void* reallocate(void* previous, size_t oldSize, size_t newSize) {
 
   return realloc(previous, newSize);
 }
+
+/**
+    @brief
+
+    @param object
+**/
 void markObject(Obj* object) {
   if (object == NULL) return;
   if (object->isMarked) return;
@@ -52,6 +72,12 @@ void markObject(Obj* object) {
 
   vm.grayStack[vm.grayCount++] = object;
 }
+
+/**
+    @brief
+
+    @param value
+**/
 void markValue(Value value) {
   if (!IS_OBJ(value)) return;
   markObject(AS_OBJ(value));
@@ -61,6 +87,12 @@ static void markArray(ValueArray* array) {
     markValue(array->values[i]);
   }
 }
+
+/**
+    @brief
+
+    @param object
+**/
 static void blackenObject(Obj* object) {
 #ifdef DEBUG_LOG_GC
   printf("%p blacken ", (void*)object);
@@ -115,6 +147,12 @@ static void blackenObject(Obj* object) {
       break;
   }
 }
+
+/**
+    @brief
+
+    @param object
+**/
 static void freeObject(Obj* object) {
 #ifdef DEBUG_LOG_GC
   printf("%p free type %d\n", (void*)object, object->type);
@@ -169,6 +207,11 @@ static void freeObject(Obj* object) {
       break;
   }
 }
+
+/**
+    @brief
+
+**/
 static void markRoots() {
   for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
     markValue(*slot);
@@ -188,12 +231,22 @@ static void markRoots() {
   markCompilerRoots();
   markObject((Obj*)vm.initString);
 }
+
+/**
+    @brief
+
+**/
 static void traceReferences() {
   while (vm.grayCount > 0) {
     Obj* object = vm.grayStack[--vm.grayCount];
     blackenObject(object);
   }
 }
+
+/**
+    @brief
+
+**/
 static void sweep() {
   Obj* previous = NULL;
   Obj* object = vm.objects;
@@ -216,6 +269,11 @@ static void sweep() {
     }
   }
 }
+
+/**
+    @brief
+
+**/
 void collectGarbage() {
 #ifdef DEBUG_LOG_GC
   printf("-- gc begin\n");
@@ -236,6 +294,11 @@ void collectGarbage() {
          vm.nextGC);
 #endif
 }
+
+/**
+    @brief
+
+**/
 void freeObjects() {
   Obj* object = vm.objects;
   while (object != NULL) {

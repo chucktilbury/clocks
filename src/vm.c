@@ -1,3 +1,9 @@
+/**
+    @file vm.c
+
+    @brief
+
+**/
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,14 +17,36 @@
 #include "vm.h"
 
 VM vm; // [one]
+
+/**
+    @brief
+
+    @param argCount
+    @param args
+    @return Value
+**/
 static Value clockNative(int argCount, Value* args) {
+  (void)argCount;
+  (void)args;
   return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
+
+/**
+    @brief
+
+**/
 static void resetStack() {
   vm.stackTop = vm.stack;
   vm.frameCount = 0;
   vm.openUpvalues = NULL;
 }
+
+/**
+    @brief
+
+    @param format
+    @param ...
+**/
 static void runtimeError(const char* format, ...) {
   va_list args;
   va_start(args, format);
@@ -43,6 +71,13 @@ static void runtimeError(const char* format, ...) {
 
   resetStack();
 }
+
+/**
+    @brief
+
+    @param name
+    @param function
+**/
 static void defineNative(const char* name, NativeFn function) {
   push(OBJ_VAL(copyString(name, (int)strlen(name))));
   push(OBJ_VAL(newNative(function)));
@@ -51,6 +86,10 @@ static void defineNative(const char* name, NativeFn function) {
   pop();
 }
 
+/**
+    @brief
+
+**/
 void initVM() {
   resetStack();
   vm.objects = NULL;
@@ -70,23 +109,55 @@ void initVM() {
   defineNative("clock", clockNative);
 }
 
+/**
+    @brief
+
+**/
 void freeVM() {
   freeTable(&vm.globals);
   freeTable(&vm.strings);
   vm.initString = NULL;
   freeObjects();
 }
+
+/**
+    @brief
+
+    @param value
+**/
 void push(Value value) {
   *vm.stackTop = value;
   vm.stackTop++;
 }
+
+/**
+    @brief
+
+    @return Value
+**/
 Value pop() {
   vm.stackTop--;
   return *vm.stackTop;
 }
+
+/**
+    @brief
+
+    @param distance
+    @return Value
+**/
 static Value peek(int distance) {
   return vm.stackTop[-1 - distance];
 }
+
+/**
+    @brief
+
+    @param closure
+    @param argCount
+    @return true
+    @return false
+**/
 static bool call(ObjClosure* closure, int argCount) {
   if (argCount != closure->function->arity) {
     runtimeError("Expected %d arguments but got %d.",
@@ -106,6 +177,15 @@ static bool call(ObjClosure* closure, int argCount) {
   frame->slots = vm.stackTop - argCount - 1;
   return true;
 }
+
+/**
+    @brief
+
+    @param callee
+    @param argCount
+    @return true
+    @return false
+**/
 static bool callValue(Value callee, int argCount) {
   if (IS_OBJ(callee)) {
     switch (OBJ_TYPE(callee)) {
@@ -148,6 +228,16 @@ static bool callValue(Value callee, int argCount) {
   runtimeError("Can only call functions and classes.");
   return false;
 }
+
+/**
+    @brief
+
+    @param klass
+    @param name
+    @param argCount
+    @return true
+    @return false
+**/
 static bool invokeFromClass(ObjClass* klass, ObjString* name,
                             int argCount) {
   Value method;
@@ -158,6 +248,15 @@ static bool invokeFromClass(ObjClass* klass, ObjString* name,
 
   return call(AS_CLOSURE(method), argCount);
 }
+
+/**
+    @brief
+
+    @param name
+    @param argCount
+    @return true
+    @return false
+**/
 static bool invoke(ObjString* name, int argCount) {
   Value receiver = peek(argCount);
 
@@ -176,6 +275,15 @@ static bool invoke(ObjString* name, int argCount) {
 
   return invokeFromClass(instance->klass, name, argCount);
 }
+
+/**
+    @brief
+
+    @param klass
+    @param name
+    @return true
+    @return false
+**/
 static bool bindMethod(ObjClass* klass, ObjString* name) {
   Value method;
   if (!tableGet(&klass->methods, name, &method)) {
@@ -188,6 +296,13 @@ static bool bindMethod(ObjClass* klass, ObjString* name) {
   push(OBJ_VAL(bound));
   return true;
 }
+
+/**
+    @brief
+
+    @param local
+    @return ObjUpvalue*
+**/
 static ObjUpvalue* captureUpvalue(Value* local) {
   ObjUpvalue* prevUpvalue = NULL;
   ObjUpvalue* upvalue = vm.openUpvalues;
@@ -210,6 +325,12 @@ static ObjUpvalue* captureUpvalue(Value* local) {
 
   return createdUpvalue;
 }
+
+/**
+    @brief
+
+    @param last
+**/
 static void closeUpvalues(Value* last) {
   while (vm.openUpvalues != NULL &&
          vm.openUpvalues->location >= last) {
@@ -219,15 +340,34 @@ static void closeUpvalues(Value* last) {
     vm.openUpvalues = upvalue->next;
   }
 }
+
+/**
+    @brief
+
+    @param name
+**/
 static void defineMethod(ObjString* name) {
   Value method = peek(0);
   ObjClass* klass = AS_CLASS(peek(1));
   tableSet(&klass->methods, name, method);
   pop();
 }
+
+/**
+    @brief
+
+    @param value
+    @return true
+    @return false
+**/
 static bool isFalsey(Value value) {
   return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
+
+/**
+    @brief
+
+**/
 static void concatenate() {
   ObjString* b = AS_STRING(peek(0));
   ObjString* a = AS_STRING(peek(1));
@@ -243,6 +383,12 @@ static void concatenate() {
   pop();
   push(OBJ_VAL(result));
 }
+
+/**
+    @brief
+
+    @return InterpretResult
+**/
 static InterpretResult run() {
   CallFrame* frame = &vm.frames[vm.frameCount - 1];
 
@@ -547,12 +693,20 @@ static InterpretResult run() {
 #undef READ_STRING
 #undef BINARY_OP
 }
+
 void hack(bool b) {
   // Hack to avoid unused function error. run() is not used in the
   // scanning chapter.
   run();
   if (b) hack(false);
 }
+
+/**
+    @brief
+
+    @param source
+    @return InterpretResult
+**/
 InterpretResult interpret(const char* source) {
   ObjFunction* function = compile(source);
   if (function == NULL) return INTERPRET_COMPILE_ERROR;
